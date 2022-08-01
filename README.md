@@ -12,7 +12,9 @@ Ensure these files are included in your .gitignore
 
 ## Run database
 
-Run your PSQL file :
+Execute the script in the terminal with 'npm run setup-dbs' 
+
+Alternatively, run your PSQL file manually:
 
     psql -f db/setup.sql
 

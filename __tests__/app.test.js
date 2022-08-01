@@ -41,7 +41,14 @@ describe('GET api/topics', () => {
             body.forEach((item => {
                 return expect(item.hasOwnProperty('description')).toBe(true)
             }))
+            body.forEach(item => {
+                expect.objectContaining({
+                    slug: expect.any(String),
+                    description: expect.any(String)
+                })
+            })
         })
+
     });
 });
 
