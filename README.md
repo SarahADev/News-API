@@ -9,3 +9,10 @@ To link Database files, create .env.test and .env.development files with the rel
 PGDATABASE=database_name_here
 
 Ensure these files are included in your .gitignore
+
+## Run database
+
+Run your PSQL file :
+
+    psql -f db/setup.sql
+
