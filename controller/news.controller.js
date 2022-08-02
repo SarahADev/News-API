@@ -2,13 +2,14 @@ const {
   selectTopics,
   selectArticleByID,
   updateArticleByID,
-  selectCommentsByID
+  selectCommentsByID,
+  selectUsers
 } = require("../model/news.model");
 
 exports.getTopics = (req, res, next) => {
   selectTopics()
     .then((response) => {
-      res.status(200).send(response);
+      res.status(200).send({ articles: response });
     })
     .catch(next);
 };
@@ -23,6 +24,7 @@ exports.getArticleByID = (req, res, next) => {
   })
   .catch(next)
 };
+
 exports.patchArticleByID = (req, res, next) => {
   if (!req.body.hasOwnProperty("inc_votes")) {
     res.status(400).send({ msg: "Bad request" });
@@ -36,4 +38,12 @@ exports.patchArticleByID = (req, res, next) => {
       })
       .catch(next);
   }
+};
+
+exports.getUsers = (req, res, next) => {
+  selectUsers()
+    .then((response) => {
+      res.status(200).send({ users: response });
+    })
+    .catch(next);
 };
