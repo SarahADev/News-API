@@ -2,6 +2,7 @@ const {
   selectTopics,
   selectArticleByID,
   updateArticleByID,
+  selectCommentsByID
 } = require("../model/news.model");
 
 exports.getTopics = (req, res, next) => {
@@ -14,11 +15,14 @@ exports.getTopics = (req, res, next) => {
 
 exports.getArticleByID = (req, res, next) => {
   const { article_id } = req.params;
-  selectArticleByID(article_id)
-    .then((output) => {
-      res.status(200).send(output);
-    })
-    .catch(next);
+  Promise.all([selectArticleByID(article_id), selectCommentsByID(article_id)])
+  .then((output) => {
+    console.log(output, 'controller output')
+    const article = output[0]
+    article.comment_count = output[1]
+    res.status(200).send({'article' : article})
+  })
+  .catch(next)
 };
 exports.patchArticleByID = (req, res, next) => {
   if (!req.body.hasOwnProperty("inc_votes")) {
