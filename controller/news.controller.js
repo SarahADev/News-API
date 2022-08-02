@@ -2,12 +2,13 @@ const {
   selectTopics,
   selectArticleByID,
   updateArticleByID,
+  selectUsers
 } = require("../model/news.model");
 
 exports.getTopics = (req, res, next) => {
   selectTopics()
     .then((response) => {
-      res.status(200).send({articles : response});
+      res.status(200).send({ articles: response });
     })
     .catch(next);
 };
@@ -16,7 +17,7 @@ exports.getArticleByID = (req, res, next) => {
   const { article_id } = req.params;
   selectArticleByID(article_id)
     .then((output) => {
-      res.status(200).send({article: output});
+      res.status(200).send({ article: output });
     })
     .catch(next);
 };
@@ -33,4 +34,12 @@ exports.patchArticleByID = (req, res, next) => {
       })
       .catch(next);
   }
+};
+
+exports.getUsers = (req, res, next) => {
+  selectUsers()
+    .then((response) => {
+      res.status(200).send({ users: response });
+    })
+    .catch(next);
 };
