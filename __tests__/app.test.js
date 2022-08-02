@@ -202,6 +202,9 @@ describe("GET /api/articles/:article_id (comment count)", () => {
       .then(({ body }) => {
         expect(body.article).toBeInstanceOf(Object)
         expect(body.article.hasOwnProperty('comment_count')).toBe(true)
+      })
+  })
+})
 
 describe("GET /api/users", () => {
   test("responds with an array of objects", () => {
@@ -233,4 +236,5 @@ describe("GET /api/users", () => {
         });
       });
   });
-});
+})
+
