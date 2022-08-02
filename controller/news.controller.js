@@ -1,18 +1,36 @@
-const { selectTopics, selectArticleByID } = require('../model/news.model')
+const {
+  selectTopics,
+  selectArticleByID,
+  updateArticleByID,
+} = require("../model/news.model");
 
 exports.getTopics = (req, res, next) => {
-    selectTopics()
+  selectTopics()
     .then((response) => {
-        res.status(200).send(response)
+      res.status(200).send(response);
     })
-    .catch(next)
-}
+    .catch(next);
+};
 
 exports.getArticleByID = (req, res, next) => {
-    const {article_id} = req.params
-    selectArticleByID(article_id)
+  const { article_id } = req.params;
+  selectArticleByID(article_id)
     .then((output) => {
-        res.status(200).send(output)
+      res.status(200).send(output);
     })
-    .catch(next)
-}
+    .catch(next);
+};
+exports.patchArticleByID = (req, res, next) => {
+  if (!req.body.hasOwnProperty("inc_votes")) {
+    res.status(400).send({ msg: "Bad request" });
+  } else {
+    const { article_id } = req.params;
+    const { inc_votes } = req.body;
+    updateArticleByID(article_id, inc_votes)
+      .then((output) => {
+        ("controller then");
+        res.status(200).send({ updatedArticle: output });
+      })
+      .catch(next);
+  }
+};
