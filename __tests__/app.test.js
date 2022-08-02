@@ -69,8 +69,8 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        expect(Array.isArray(body)).toBe(false);
-        expect(typeof body).toBe("object");
+        expect(Array.isArray(body.article)).toBe(false);
+        expect(typeof body.article).toBe("object");
       });
   });
   test("object contains following properties: article_id, author, title, body, topic, created_at, votes", () => {
@@ -78,7 +78,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        expect(body).toEqual(
+        expect(body.article).toEqual(
           expect.objectContaining({
             article_id: expect.anything(),
             author: expect.anything(),
@@ -206,7 +206,7 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-describe.only("GET /api/articles/:article_id (comment count)", () => {
+describe("GET /api/articles/:article_id (comment count)", () => {
   test("returned object should include comment property", () => {
     return request(app)
       .get("/api/articles/1")
