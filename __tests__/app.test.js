@@ -194,6 +194,15 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
+describe("GET /api/articles/:article_id (comment count)", () => {
+  test("returned object should include comment property", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toBeInstanceOf(Object)
+        expect(body.article.hasOwnProperty('comment_count')).toBe(true)
+
 describe("GET /api/users", () => {
   test("responds with an array of objects", () => {
     return request(app)
