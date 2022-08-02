@@ -126,6 +126,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .then(({ body }) => {
         expect(typeof body.updatedArticle).toBe("object");
         expect(Array.isArray(body.updatedArticle)).toBe(false)
+        expect(body.updatedArticle).toBeInstanceOf(Object)
         expect(body.updatedArticle).not.toEqual(originArticle1)
       });
   });
