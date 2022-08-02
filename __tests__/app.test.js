@@ -103,6 +103,103 @@ describe("GET /api/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe('Object not found')
+        });
+    });
+})
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("takes an object and returns the updated article object", () => {
+    const input = { inc_votes: 3 };
+    const originArticle1 = {
+        article_id: 1,
+        title: 'Living in the shadow of a great man',
+        topic: 'mitch',
+        author: 'butter_bridge',
+        body: 'I find this existence challenging',
+        created_at: '2020-07-09T20:11:00.000Z',
+        votes: 100
+      }
+    return request(app)
+      .patch("/api/articles/1")
+      .send(input)
+      .expect(200)
+      .then(({ body }) => {
+        expect(typeof body.updatedArticle).toBe("object");
+        expect(Array.isArray(body.updatedArticle)).toBe(false)
+        expect(body.updatedArticle).toBeInstanceOf(Object)
+        expect(body.updatedArticle).not.toEqual(originArticle1)
+      });
+  });
+  test("increments the votes with a positive number", () => {
+    const input = { inc_votes: 10 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(input)
+      .expect(200)
+      .then(({ body }) => {
+        const updatedArticle = body.updatedArticle
+        expect(updatedArticle.votes).toBe(110)
+      });
+  });
+  test("decrements the votes with a negative number", () => {
+    const input = { inc_votes: -10 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(input)
+      .expect(200)
+      .then(({ body }) => {
+        const updatedArticle = body.updatedArticle
+        expect(updatedArticle.votes).toBe(90)
+      });
+  });
+  test("wrong format of input returns 400 bad request", () => {
+    const input = { nonsense: 3 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad request')
+      });
+  });
+  test("invalid value input returns 400 bad request", () => {
+    const input = { inc_votes: 'nonsense' };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("accesses the correct article", () => {
+    const input = { inc_votes: 0 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(input)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.updatedArticle.article_id).toBe(1)
+      });
+  });
+  test("valid but out of range article returns 404 not found", () => {
+    const input = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/900")
+      .send(input)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Object not found");
+      });
+  });
+  test("invalid article value returns 400 bad request", () => {
+    const input = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/nonsense")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
       });
   });
 });
