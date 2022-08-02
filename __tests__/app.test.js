@@ -40,12 +40,14 @@ describe("GET api/topics", () => {
         body.forEach((item) => {
           return expect(item.hasOwnProperty("description")).toBe(true);
         });
-        body.forEach(item => {
-           expect(item).toEqual(expect.objectContaining({
-                slug: expect.anything(),
-                description: expect.anything()
-            }))
-        })
+        body.forEach((item) => {
+          expect(item).toEqual(
+            expect.objectContaining({
+              slug: expect.anything(),
+              description: expect.anything(),
+            })
+          );
+        });
       });
   });
 });
@@ -94,7 +96,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/bananas")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('Bad request')
+        expect(body.msg).toBe("Bad request");
       });
   });
   test("Bad request- valid but out of range- returns 404 object not found", () => {
@@ -102,32 +104,32 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/900000")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe('Object not found')
-        });
-    });
-})
+        expect(body.msg).toBe("Object not found");
+      });
+  });
+});
 
 describe("PATCH /api/articles/:article_id", () => {
   test("takes an object and returns the updated article object", () => {
     const input = { inc_votes: 3 };
     const originArticle1 = {
-        article_id: 1,
-        title: 'Living in the shadow of a great man',
-        topic: 'mitch',
-        author: 'butter_bridge',
-        body: 'I find this existence challenging',
-        created_at: '2020-07-09T20:11:00.000Z',
-        votes: 100
-      }
+      article_id: 1,
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      created_at: "2020-07-09T20:11:00.000Z",
+      votes: 100,
+    };
     return request(app)
       .patch("/api/articles/1")
       .send(input)
       .expect(200)
       .then(({ body }) => {
         expect(typeof body.updatedArticle).toBe("object");
-        expect(Array.isArray(body.updatedArticle)).toBe(false)
-        expect(body.updatedArticle).toBeInstanceOf(Object)
-        expect(body.updatedArticle).not.toEqual(originArticle1)
+        expect(Array.isArray(body.updatedArticle)).toBe(false);
+        expect(body.updatedArticle).toBeInstanceOf(Object);
+        expect(body.updatedArticle).not.toEqual(originArticle1);
       });
   });
   test("increments the votes with a positive number", () => {
@@ -137,8 +139,8 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(input)
       .expect(200)
       .then(({ body }) => {
-        const updatedArticle = body.updatedArticle
-        expect(updatedArticle.votes).toBe(110)
+        const updatedArticle = body.updatedArticle;
+        expect(updatedArticle.votes).toBe(110);
       });
   });
   test("decrements the votes with a negative number", () => {
@@ -148,8 +150,8 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(input)
       .expect(200)
       .then(({ body }) => {
-        const updatedArticle = body.updatedArticle
-        expect(updatedArticle.votes).toBe(90)
+        const updatedArticle = body.updatedArticle;
+        expect(updatedArticle.votes).toBe(90);
       });
   });
   test("wrong format of input returns 400 bad request", () => {
@@ -159,11 +161,11 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(input)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('Bad request')
+        expect(body.msg).toBe("Bad request");
       });
   });
   test("invalid value input returns 400 bad request", () => {
-    const input = { inc_votes: 'nonsense' };
+    const input = { inc_votes: "nonsense" };
     return request(app)
       .patch("/api/articles/1")
       .send(input)
@@ -179,7 +181,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(input)
       .expect(200)
       .then(({ body }) => {
-        expect(body.updatedArticle.article_id).toBe(1)
+        expect(body.updatedArticle.article_id).toBe(1);
       });
   });
   test("valid but out of range article returns 404 not found", () => {
@@ -200,6 +202,18 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad request");
+      });
+  });
+});
+
+describe.only("GET /api/articles/:article_id (comment count)", () => {
+  test("returned object should include comment property", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toBeInstanceOf(Object)
+        expect(body.article.hasOwnProperty('comment_count')).toBe(true)
       });
   });
 });
