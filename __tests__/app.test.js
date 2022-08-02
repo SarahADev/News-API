@@ -112,24 +112,12 @@ describe("GET /api/articles/:article_id", () => {
 describe("PATCH /api/articles/:article_id", () => {
   test("takes an object and returns the updated article object", () => {
     const input = { inc_votes: 3 };
-    const originArticle1 = {
-      article_id: 1,
-      title: "Living in the shadow of a great man",
-      topic: "mitch",
-      author: "butter_bridge",
-      body: "I find this existence challenging",
-      created_at: "2020-07-09T20:11:00.000Z",
-      votes: 100,
-    };
     return request(app)
       .patch("/api/articles/1")
       .send(input)
       .expect(200)
       .then(({ body }) => {
-        expect(typeof body.updatedArticle).toBe("object");
-        expect(Array.isArray(body.updatedArticle)).toBe(false);
         expect(body.updatedArticle).toBeInstanceOf(Object);
-        expect(body.updatedArticle).not.toEqual(originArticle1);
       });
   });
   test("increments the votes with a positive number", () => {
@@ -212,6 +200,7 @@ describe("GET /api/users", () => {
       .get("/api/users")
       .expect(200)
       .then(({ body }) => {
+        expect(body.users.length).toBeGreaterThan(1)
         expect(Array.isArray(body.users)).toBe(true);
         body.users.forEach((item) => {
           return expect(item).toBeInstanceOf(Object);
@@ -223,6 +212,7 @@ describe("GET /api/users", () => {
       .get("/api/users")
       .expect(200)
       .then(({ body }) => {
+        expect(body.users.length).toBeGreaterThan(1)
         body.users.forEach((item) => {
           expect(item).toEqual(
             expect.objectContaining({
