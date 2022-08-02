@@ -7,7 +7,7 @@ const {
 exports.getTopics = (req, res, next) => {
   selectTopics()
     .then((response) => {
-      res.status(200).send(response);
+      res.status(200).send({articles : response});
     })
     .catch(next);
 };
@@ -16,7 +16,7 @@ exports.getArticleByID = (req, res, next) => {
   const { article_id } = req.params;
   selectArticleByID(article_id)
     .then((output) => {
-      res.status(200).send(output);
+      res.status(200).send({article: output});
     })
     .catch(next);
 };

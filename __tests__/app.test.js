@@ -16,7 +16,7 @@ describe("GET api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        expect(Array.isArray(body)).toBe(true);
+        expect(Array.isArray(body.articles)).toBe(true);
       });
   });
   test("returns an array of objects", () => {
@@ -24,8 +24,8 @@ describe("GET api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        body.forEach((item) => {
-          return expect(typeof item).toBe("object");
+        body.articles.forEach((item) => {
+          return expect(item).toBeInstanceOf(Object);
         });
       });
   });
@@ -34,13 +34,13 @@ describe("GET api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        body.forEach((item) => {
+        body.articles.forEach((item) => {
           return expect(item.hasOwnProperty("slug")).toBe(true);
         });
-        body.forEach((item) => {
+        body.articles.forEach((item) => {
           return expect(item.hasOwnProperty("description")).toBe(true);
         });
-        body.forEach(item => {
+        body.articles.forEach(item => {
            expect(item).toEqual(expect.objectContaining({
                 slug: expect.anything(),
                 description: expect.anything()
@@ -67,8 +67,8 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        expect(Array.isArray(body)).toBe(false);
-        expect(typeof body).toBe("object");
+        expect(Array.isArray(body.article)).toBe(false);
+        expect(typeof body.article).toBe("object");
       });
   });
   test("object contains following properties: article_id, author, title, body, topic, created_at, votes", () => {
@@ -76,7 +76,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        expect(body).toEqual(
+        expect(body.article).toEqual(
           expect.objectContaining({
             article_id: expect.anything(),
             author: expect.anything(),
