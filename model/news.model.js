@@ -35,3 +35,12 @@ exports.updateArticleByID = (article_id, newVotes) => {
       }
     });
 };
+
+exports.selectCommentsByID = (article_id) => {
+  return db
+    .query("SELECT * FROM comments WHERE article_id = $1;", [article_id])
+    .then(({ rows }) => {
+      console.log(rows, "comment model output");
+      return rows.length;
+    });
+};
