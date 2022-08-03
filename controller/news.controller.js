@@ -2,7 +2,7 @@ const {
   selectTopics,
   selectArticleByID,
   updateArticleByID,
-  selectCommentsByID,
+  selectCommentsByArticleID,
   selectUsers,
   selectArticles,
 } = require("../model/news.model");
@@ -18,10 +18,10 @@ exports.getTopics = (req, res, next) => {
 exports.getArticleByID = (req, res, next) => {
   const { article_id } = req.params;
   selectArticleByID(article_id)
-  .then((response) => {
-    res.status(200).send({article : response})
-  })
-  .catch(next)
+    .then((response) => {
+      res.status(200).send({ article: response });
+    })
+    .catch(next);
 };
 
 exports.patchArticleByID = (req, res, next) => {
@@ -50,21 +50,16 @@ exports.getUsers = (req, res, next) => {
 exports.getArticles = (req, res, next) => {
   selectArticles()
     .then((response) => {
-        res.status(200).send({articles : response})
+      res.status(200).send({ articles: response });
     })
     .catch(next);
 };
 
 exports.getCommentsByArticleID = (req, res, next) => {
-    const {article_id} = req.params
-    console.log(req.params)
-    selectCommentsByID(article_id)
+  const { article_id } = req.params;
+  selectCommentsByArticleID(article_id)
     .then((response) => {
-        console.log(response, 'CONTROLLER')
-        res.status(200).send({comments : response})
+      res.status(200).send({ comments: response });
     })
-    .catch((err) => {
-        console.log(err, 'controller ERR')
-        next(err)
-    })
-}
+    .catch(next);
+};
