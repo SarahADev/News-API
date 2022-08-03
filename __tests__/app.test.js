@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 const request = require("supertest");
-require("jest-sorted")
+require("jest-sorted");
 const app = require("../app");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
@@ -271,12 +271,62 @@ describe("GET /api/articles", () => {
   });
   test("articles are sorted by date in descending order", () => {
     return request(app)
-    .get('/api/articles')
-    .expect(200)
-    .then(({body}) => {
-        expect(body.articles).toBeSortedBy('created_at', {
-            descending: true,
-          });
-    })
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("returns an array of comments", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.comments)).toBe(true);
+        expect(body.comments.length).toBeGreaterThan(1);
+        body.comments.forEach((item) => {
+          expect(item).toBeInstanceOf(Object);
+        });
+      });
+  });
+  test("comment objects contain the properties: comment_id, votes, created_at, author, body", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBeGreaterThan(1);
+        body.comments.forEach((item) => {
+          expect(item).toEqual(
+            expect.objectContaining({
+              comment_id: expect.anything(),
+              votes: expect.anything(),
+              created_at: expect.anything(),
+              author: expect.anything(),
+              body: expect.anything(),
+            })
+          );
+        });
+      });
+  });
+  test("invalid article_id should return 400 bad request", () => {
+    return request(app)
+      .get("/api/articles/bananas/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("valid but out of range article_id should return 404 not found", () => {
+    return request(app)
+      .get("/api/articles/900000/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Object not found");
+      });
   });
 });
