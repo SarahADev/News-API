@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 const request = require("supertest");
+require("jest-sorted")
 const app = require("../app");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
@@ -16,7 +17,7 @@ describe("GET api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        expect(Array.isArray(body.articles)).toBe(true);
+        expect(Array.isArray(body.topics)).toBe(true);
       });
   });
   test("returns an array of objects", () => {
@@ -24,7 +25,8 @@ describe("GET api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        body.articles.forEach((item) => {
+        expect(body.topics.length).toBeGreaterThan(1);
+        body.topics.forEach((item) => {
           return expect(item).toBeInstanceOf(Object);
         });
       });
@@ -34,13 +36,8 @@ describe("GET api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        body.articles.forEach((item) => {
-          return expect(item.hasOwnProperty("slug")).toBe(true);
-        });
-        body.articles.forEach((item) => {
-          return expect(item.hasOwnProperty("description")).toBe(true);
-        });
-        body.articles.forEach((item) => {
+        expect(body.topics.length).toBeGreaterThan(1);
+        body.topics.forEach((item) => {
           expect(item).toEqual(
             expect.objectContaining({
               slug: expect.anything(),
@@ -200,8 +197,11 @@ describe("GET /api/articles/:article_id (comment count)", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        expect(body.article).toBeInstanceOf(Object)
-        expect(body.article.hasOwnProperty('comment_count')).toBe(true)
+        expect(body.article).toBeInstanceOf(Object);
+        expect(body.article.hasOwnProperty("comment_count")).toBe(true);
+      });
+  });
+});
 
 describe("GET /api/users", () => {
   test("responds with an array of objects", () => {
@@ -209,7 +209,7 @@ describe("GET /api/users", () => {
       .get("/api/users")
       .expect(200)
       .then(({ body }) => {
-        expect(body.users.length).toBeGreaterThan(1)
+        expect(body.users.length).toBeGreaterThan(1);
         expect(Array.isArray(body.users)).toBe(true);
         body.users.forEach((item) => {
           return expect(item).toBeInstanceOf(Object);
@@ -221,16 +221,62 @@ describe("GET /api/users", () => {
       .get("/api/users")
       .expect(200)
       .then(({ body }) => {
-        expect(body.users.length).toBeGreaterThan(1)
+        expect(body.users.length).toBeGreaterThan(1);
         body.users.forEach((item) => {
           expect(item).toEqual(
             expect.objectContaining({
               username: expect.anything(),
               name: expect.anything(),
-              avatar_url : expect.anything()
+              avatar_url: expect.anything(),
             })
           );
         });
       });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("returns an array of article objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.articles)).toBe(true);
+        expect(body.articles.length).toBeGreaterThan(1);
+        body.articles.forEach((item) => {
+          expect(item).toBeInstanceOf(Object);
+        });
+      });
+  });
+  test("article objects contain properties: author, title, article_id, topic, created_at, votes, comment_count", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBeGreaterThan(1);
+        body.articles.forEach((item) => {
+          expect(item).toEqual(
+            expect.objectContaining({
+              author: expect.anything(),
+              title: expect.anything(),
+              article_id: expect.anything(),
+              topic: expect.anything(),
+              created_at: expect.anything(),
+              votes: expect.anything(),
+              comment_count: expect.anything(),
+            })
+          );
+        });
+      });
+  });
+  test("articles are sorted by date in descending order", () => {
+    return request(app)
+    .get('/api/articles')
+    .expect(200)
+    .then(({body}) => {
+        expect(body.articles).toBeSortedBy('created_at', {
+            descending: true,
+          });
+    })
   });
 });
