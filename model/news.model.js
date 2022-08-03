@@ -66,3 +66,13 @@ exports.selectCommentsByArticleID = (article_id) => {
       }
     });
 };
+
+exports.insertCommentByArticleID = (article_id, username, body) => {
+    console.log('in the model')
+    console.log(article_id, username, body)
+    return db.query('INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;', [article_id, username, body])
+    .then(({rows}) => {
+        console.log(rows, 'MODEL')
+        return rows
+    })
+}

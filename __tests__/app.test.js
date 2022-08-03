@@ -287,6 +287,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
+        console.log(body)
         expect(Array.isArray(body.comments)).toBe(true);
         expect(body.comments.length).toBeGreaterThan(1);
         body.comments.forEach((item) => {
@@ -328,5 +329,21 @@ describe("GET /api/articles/:article_id/comments", () => {
       .then(({ body }) => {
         expect(body.msg).toBe("Object not found");
       });
+  });
+});
+
+describe.only("POST /api/articles/:article_id/comments", () => {
+  test("should ", () => {
+    const input = {
+        username : 'SarahADev',
+        body : 'A comment here'
+    }
+    return request(app)
+    .post("/api/articles/1/comments")
+    .send(input)
+    .then(({body}) => {
+        console.log(body, 'test body')
+
+    })
   });
 });
