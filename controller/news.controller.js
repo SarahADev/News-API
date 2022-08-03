@@ -17,13 +17,11 @@ exports.getTopics = (req, res, next) => {
 
 exports.getArticleByID = (req, res, next) => {
   const { article_id } = req.params;
-  Promise.all([selectArticleByID(article_id), selectCommentsByID(article_id)])
-    .then((output) => {
-      const article = output[0];
-      article.comment_count = output[1];
-      res.status(200).send({ article: article });
-    })
-    .catch(next);
+  selectArticleByID(article_id)
+  .then((response) => {
+    res.status(200).send({article : response})
+  })
+  .catch(next)
 };
 
 exports.patchArticleByID = (req, res, next) => {
@@ -56,3 +54,17 @@ exports.getArticles = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.getCommentsByArticleID = (req, res, next) => {
+    const {article_id} = req.params
+    console.log(req.params)
+    selectCommentsByID(article_id)
+    .then((response) => {
+        console.log(response, 'CONTROLLER')
+        res.status(200).send({comments : response})
+    })
+    .catch((err) => {
+        console.log(err, 'controller ERR')
+        next(err)
+    })
+}
