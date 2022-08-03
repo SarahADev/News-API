@@ -9,7 +9,7 @@ exports.selectTopics = () => {
 exports.selectArticleByID = (article_id) => {
   return db
     .query(
-      "SELECT article_id, author, title, body, topic, created_at, votes FROM articles JOIN users ON articles.author = users.username WHERE article_id = $1;",
+      "SELECT article_id, author, title, body, topic, created_at, votes FROM articles WHERE article_id = $1;",
       [article_id]
     )
     .then((res) => {
@@ -45,7 +45,17 @@ exports.selectCommentsByID = (article_id) => {
 };
 
 exports.selectUsers = () => {
-    return db.query("SELECT * FROM users;").then(({ rows }) => {
-      return rows;
+  return db.query("SELECT * FROM users;").then(({ rows }) => {
+    return rows;
+  });
+};
+
+exports.selectArticles = () => {
+  return db
+    .query(
+      "SELECT articles.article_id, articles.title, articles.author, articles.topic, articles.created_at, articles.votes, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id ORDER BY created_at DESC;"
+    )
+    .then(({ rows }) => {
+      return rows
     });
-  };
+};
