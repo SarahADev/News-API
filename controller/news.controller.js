@@ -69,14 +69,10 @@ exports.getCommentsByArticleID = (req, res, next) => {
 exports.postCommentByArticleID = (req, res, next) => {
     const {article_id} = req.params
     const {username, body} = req.body
-    console.log( article_id, username, body, 'CONTROLLER INPUTS')
+
     insertCommentByArticleID(article_id, username, body)
     .then((response) => {
-        console.log(response, 'CONTROLLER RESPONSE')
-        res.status(200).send({addedComment : response})
+        res.status(201).send({addedComment : response})
     })
-    .catch((err) => {
-        console.log(err)
-        next(err)
-    })
+    .catch(next)
 }
