@@ -269,16 +269,16 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  test("articles are sorted by date in descending order", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.articles).toBeSortedBy("created_at", {
-          descending: true,
-        });
-      });
-  });
+  //   test("articles are sorted by date in descending order", () => {
+  //     return request(app)
+  //       .get("/api/articles")
+  //       .expect(200)
+  //       .then(({ body }) => {
+  //         expect(body.articles).toBeSortedBy("created_at", {
+  //           descending: true,
+  //         });
+  //       });
+  //   });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -331,6 +331,130 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
+
+describe("GET /api/articles (queries)", () => {
+  describe("sort_by", () => {
+    test("should sort by input query", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSortedBy("title", {
+            descending: true,
+          });
+        });
+    });
+    test("if no input, defaults to date", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    test("invalid value returns 400 bad request", () => {
+      return request(app)
+        .get("/api/articles?sort_by=nonsense")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+  });
+  describe("order", () => {
+    test("can order by ASC", () => {
+      return request(app)
+        .get("/api/articles?order=ASC")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSortedBy("created_at", {
+            ascending: true,
+          });
+        });
+    });
+    test("can order by DESC", () => {
+      return request(app)
+        .get("/api/articles?order=DESC")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    test("if no input, defaults to desc", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    test("invalid input value returns 400 bad request", () => {
+      return request(app)
+        .get("/api/articles?order=nonsense")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+  });
+  describe("topic", () => {
+    test("should filter by input topic cats", () => {
+      return request(app)
+        .get("/api/articles?topic=cats")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles[0].topic).toBe("cats");
+        });
+    });
+    test("filters for mitch", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).toBeGreaterThan(1);
+          body.articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+          });
+        });
+    });
+    test("if no input, no articles are filtered out", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).toBeGreaterThan(1);
+          let mitchCount = 0;
+          let catsCount = 0;
+          body.articles.forEach((article) => {
+            if (article.topic === "cats") {
+              catsCount++;
+            } else if (article.topic === "mitch") {
+              mitchCount++;
+            }
+          });
+          expect(mitchCount).not.toBe(0);
+          expect(catsCount).not.toBe(0);
+          //is there a better way to do this ^^^ (checking both mitch and cats exist)
+          expect(body.articles.length).toBe(12);
+        });
+    });
+    test("invalid input value returns 400 bad request", () => {
+      return request(app)
+        .get("/api/articles?topic=nonsense")
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe('Bad request')
+        });
+    });
+  });
+  xdescribe("can sort_by, order and filter by topic", () => {});
+ })
 describe("POST /api/articles/:article_id/comments", () => {
   test("returns an object", () => {
     const input = {
@@ -447,4 +571,5 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Bad request");
       });
   });
+
 });
