@@ -97,7 +97,10 @@ exports.selectCommentsByArticleID = (article_id) => {
     });
 };
 
-// let queryStr =
-// "SELECT articles.article_id, articles.title, articles.author, articles.topic, articles.created_at, articles.votes, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id ";
+exports.insertCommentByArticleID = (article_id, username, body) => {
+    return db.query('INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;', [article_id, username, body])
+    .then(({rows}) => {
+        return rows[0]
+    })
+}
 
-// queryStr += `ORDER BY ${sort_by} ${order};`;
