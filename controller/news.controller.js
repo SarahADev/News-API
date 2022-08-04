@@ -6,7 +6,8 @@ const {
   selectCommentsByArticleID,
   selectUsers,
   selectArticles,
-  insertCommentByArticleID
+  insertCommentByArticleID,
+  removeCommentByCommentID,
 } = require("../model/news.model");
 
 exports.getTopics = (req, res, next) => {
@@ -50,7 +51,7 @@ exports.getUsers = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-    const {sort_by, order, topic} = req.query
+  const { sort_by, order, topic } = req.query;
   selectArticles(sort_by, order, topic)
     .then((response) => {
       res.status(200).send({ articles: response });
@@ -68,12 +69,21 @@ exports.getCommentsByArticleID = (req, res, next) => {
 };
 
 exports.postCommentByArticleID = (req, res, next) => {
-    const {article_id} = req.params
-    const {username, body} = req.body
+  const { article_id } = req.params;
+  const { username, body } = req.body;
 
-    insertCommentByArticleID(article_id, username, body)
+  insertCommentByArticleID(article_id, username, body)
     .then((response) => {
-        res.status(201).send({addedComment : response})
+      res.status(201).send({ addedComment: response });
+    })
+    .catch(next);
+};
+
+exports.deleteCommentByCommentID = (req, res, next) => {
+    const {comment_id} = req.params
+    removeCommentByCommentID(comment_id)
+    .then((response) => {
+        res.sendStatus(204)
     })
     .catch(next)
 }
