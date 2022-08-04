@@ -269,16 +269,16 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  //   test("articles are sorted by date in descending order", () => {
-  //     return request(app)
-  //       .get("/api/articles")
-  //       .expect(200)
-  //       .then(({ body }) => {
-  //         expect(body.articles).toBeSortedBy("created_at", {
-  //           descending: true,
-  //         });
-  //       });
-  //   });
+  test("articles are sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -612,6 +612,59 @@ describe("DELETE /api/comments/:comment_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Object not found");
+      });
+  });
+});
+
+describe("GET /api", () => {
+  test("returns a JSON describing all the available endpoints on the API", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          Endpoints: [
+            {
+              Endpoint: "GET /api/topics",
+              Description:
+                "Returns an array of topic objects, including slug and description properties.",
+            },
+            {
+              Endpoint: "GET /api/users",
+              Description: "Responds with an array of user objects.",
+            },
+            {
+              Endpoint: "GET /api/articles",
+              Description:
+                "Returns an array of article objects, including the comment count for each article. Optional queries of sort_by, order and topic to sort and filter the returned array.",
+            },
+            {
+              Endpoint: "GET /api/articles/:article_id",
+              Description:
+                "Returns the article with associated article_id, including the count of associated comments.",
+            },
+            {
+              Endpoint: "PATCH /api/articles/:article_id",
+              Description:
+                "Takes an object with inc_votes property and INT value, and amends the vote count on the associated article by the value. (E.g. { inc_votes : 3 } )",
+            },
+            {
+              Endpoint: "GET /api/articles/:article_id/comments",
+              Description:
+                "Returns an array of comments with the associated article_id number.",
+            },
+            {
+              Endpoint: "POST /api/articles/:article_id/comments",
+              Description:
+                'Takes an object of an authorised user (username) and comment (body), and posts the comment. (E.g. { username : "User", body : "Comment"} )',
+            },
+            {
+              Endpoint: "DELETE /api/comments/:comment_id",
+              Description:
+                "Deletes the comment with the associated comment_id.",
+            },
+          ],
+        });
       });
   });
 });

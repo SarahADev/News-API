@@ -11,6 +11,7 @@ const {
   getCommentsByArticleID,
   postCommentByArticleID,
   deleteCommentByCommentID,
+  getEndpoints
 } = require("./controller/news.controller");
 
 app.get("/api/topics", getTopics);
@@ -18,6 +19,7 @@ app.get("/api/articles/:article_id", getArticleByID);
 app.get("/api/users", getUsers);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleID);
+app.get('/api', getEndpoints)
 
 app.post("/api/articles/:article_id/comments", postCommentByArticleID);
 
