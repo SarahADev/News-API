@@ -330,3 +330,121 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("returns an object", () => {
+    const input = {
+      username: "butter_bridge",
+      body: "A comment here",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(input)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.addedComment).toBeInstanceOf(Object);
+      });
+  });
+  test("should return 201 and the posted comment", () => {
+    const input = {
+      username: "butter_bridge",
+      body: "A comment here",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(input)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.addedComment.article_id).toBe(1);
+        expect(body.addedComment.author).toBe(input.username);
+        expect(body.addedComment.body).toBe(input.body);
+      });
+  });
+  test("posted comment contains the author, comment_id, article_id, body, created_at and votes properties", () => {
+    const input = {
+      username: "butter_bridge",
+      body: "A comment here",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(input)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.addedComment).toEqual(
+          expect.objectContaining({
+            author: expect.anything(),
+            comment_id: expect.anything(),
+            body: expect.anything(),
+            article_id: expect.anything(),
+            created_at: expect.anything(),
+            votes: expect.anything(),
+          })
+        );
+      });
+  });
+  test("invalid body value returns 400 Bad request, cannot insert into table", () => {
+    const input = {
+      username: "butter_bridge",
+      body: null,
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request, cannot insert into table");
+      });
+  });
+  test("invalid username value returns 400 Bad request, cannot insert into table", () => {
+    const input = {
+      username: "NotAUSer",
+      body: "A comment here",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("input format returns 400 Bad request", () => {
+    const input = {
+      wrong: "butter_bridge",
+      format: "A comment here",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request, cannot insert into table");
+      });
+  });
+  test("invalid article ID", () => {
+    const input = {
+      username: "butter_bridge",
+      body: "A comment here",
+    };
+    return request(app)
+      .post("/api/articles/nonsense/comments")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("valid, out of range article ID", () => {
+    const input = {
+      username: "butter_bridge",
+      body: "A comment here",
+    };
+    return request(app)
+      .post("/api/articles/900/comments")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+});
