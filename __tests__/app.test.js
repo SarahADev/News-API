@@ -331,7 +331,6 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-
 describe("GET /api/articles (queries)", () => {
   describe("sort_by", () => {
     test("should sort by input query", () => {
@@ -440,7 +439,6 @@ describe("GET /api/articles (queries)", () => {
           });
           expect(mitchCount).not.toBe(0);
           expect(catsCount).not.toBe(0);
-          //is there a better way to do this ^^^ (checking both mitch and cats exist)
           expect(body.articles.length).toBe(12);
         });
     });
@@ -449,12 +447,35 @@ describe("GET /api/articles (queries)", () => {
         .get("/api/articles?topic=nonsense")
         .expect(400)
         .then(({ body }) => {
-            expect(body.msg).toBe('Bad request')
+          expect(body.msg).toBe("Bad request");
         });
     });
   });
-  xdescribe("can sort_by, order and filter by topic", () => {});
- })
+  describe("All 3 queries at once", () => {
+    test("can sort_by, order and filter by topic", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author&&order=ASC&&topic=mitch")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).toBeGreaterThan(1);
+          body.articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+          });
+          expect(body.articles).toBeSortedBy("author", {
+            ascending: true,
+          });
+        });
+    });
+  });
+  test("Valid topic but no associated articles returns 404 object not found", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Object not found");
+      });
+  });
+});
 describe("POST /api/articles/:article_id/comments", () => {
   test("returns an object", () => {
     const input = {
@@ -571,5 +592,26 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe("Bad request");
       });
   });
+});
 
+describe("DELETE /api/comments/:comment_id", () => {
+  test("Deleted comment returns 204 no content", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("Invalid comment_id returns 400 bad request", () => {
+    return request(app)
+      .delete("/api/comments/nonsense")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("Valid but out of range comment_id returns 404 object not found", () => {
+    return request(app)
+      .delete("/api/comments/900")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Object not found");
+      });
+  });
 });
