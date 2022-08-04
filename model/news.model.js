@@ -54,7 +54,7 @@ exports.selectArticles = (sort_by = "created_at", order = "DESC", topic) => {
   ];
   const validOrder = ["asc", "desc", "ASC", "DESC"];
 
-  const validTopic = ["cats", "mitch", undefined];
+  const validTopic = ["cats", "mitch", "paper", undefined];
 
   if (!validSortBy.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Bad request" });
@@ -77,8 +77,12 @@ exports.selectArticles = (sort_by = "created_at", order = "DESC", topic) => {
 
   queryStr += `ORDER BY ${sort_by} ${order};`;
 
-  return db.query(queryStr).then(({ rows }) => {
-    return rows;
+  return db.query(queryStr).then((res) => {
+    if (res.rowCount === 0) {
+      return Promise.reject({ status: 404, msg: "Object not found" });
+    } else {
+      return res.rows;
+    }
   });
 };
 
@@ -98,9 +102,23 @@ exports.selectCommentsByArticleID = (article_id) => {
 };
 
 exports.insertCommentByArticleID = (article_id, username, body) => {
-    return db.query('INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;', [article_id, username, body])
-    .then(({rows}) => {
-        return rows[0]
+  return db
+    .query(
+      "INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;",
+      [article_id, username, body]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
+exports.removeCommentByCommentID = (comment_id) => {
+    return db.query('DELETE FROM comments WHERE comment_id = $1 RETURNING *', [comment_id])
+    .then((res) => {
+        if (res.rowCount === 1) {
+            return res.rowCount
+        } else if (res.rowCount === 0){
+            return Promise.reject({status : 404, msg:'Object not found'})
+        }
     })
 }
-
