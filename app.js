@@ -18,7 +18,7 @@ app.get("/api/users", getUsers);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleID);
 
-app.post('/api/articles/:article_id/comments', postCommentByArticleID)
+app.post("/api/articles/:article_id/comments", postCommentByArticleID);
 
 app.patch("/api/articles/:article_id", patchArticleByID);
 
@@ -32,6 +32,16 @@ app.use((err, req, res, next) => {
     res.status(400).send({ msg: "Bad request" });
   } else {
     next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.code === "23503") {
+    res.status(400).send({ msg: "Bad request" });
+  } else if (err.code === "23502") {
+    res.status(400).send({ msg: "Bad request, cannot insert into table" });
+  } else {
+    next(err)
   }
 });
 
