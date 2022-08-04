@@ -442,12 +442,12 @@ describe("GET /api/articles (queries)", () => {
           expect(body.articles.length).toBe(12);
         });
     });
-    test("invalid input value returns 400 bad request", () => {
+    test("non-existent input value returns 404 not found", () => {
       return request(app)
         .get("/api/articles?topic=nonsense")
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe("Bad request");
+          expect(body.msg).toBe("Object not found");
         });
     });
   });

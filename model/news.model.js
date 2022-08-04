@@ -54,15 +54,10 @@ exports.selectArticles = (sort_by = "created_at", order = "DESC", topic) => {
   ];
   const validOrder = ["asc", "desc", "ASC", "DESC"];
 
-  const validTopic = ["cats", "mitch", "paper", undefined];
-
   if (!validSortBy.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
   if (!validOrder.includes(order)) {
-    return Promise.reject({ status: 400, msg: "Bad request" });
-  }
-  if (!validTopic.includes(topic)) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
 
@@ -113,12 +108,15 @@ exports.insertCommentByArticleID = (article_id, username, body) => {
 };
 
 exports.removeCommentByCommentID = (comment_id) => {
-    return db.query('DELETE FROM comments WHERE comment_id = $1 RETURNING *', [comment_id])
+  return db
+    .query("DELETE FROM comments WHERE comment_id = $1 RETURNING *", [
+      comment_id,
+    ])
     .then((res) => {
-        if (res.rowCount === 1) {
-            return res.rowCount
-        } else if (res.rowCount === 0){
-            return Promise.reject({status : 404, msg:'Object not found'})
-        }
-    })
-}
+      if (res.rowCount === 1) {
+        return res.rowCount;
+      } else if (res.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "Object not found" });
+      }
+    });
+};
