@@ -9,7 +9,8 @@ const {
   insertCommentByArticleID,
   removeCommentByCommentID,
   selectUsersByUsername,
-  updateCommentVoteByID
+  updateCommentVoteByID,
+  insertArticle
 } = require("../model/news.model");
 
 exports.getTopics = (req, res, next) => {
@@ -156,4 +157,14 @@ exports.patchCommentVoteByID = (req, res, next) => {
       })
       .catch(next);
   }
+};
+
+exports.postArticle = (req, res, next) => {
+  const { author, title, body, topic } = req.body;
+
+  insertArticle(author, title, body, topic)
+    .then((response) => {
+      res.status(201).send({ addedArticle: response });
+    })
+    .catch(next);
 };

@@ -781,3 +781,109 @@ describe('PATCH /api/comments/:comment_id', () => {
       });
   });
 });
+
+describe.only('POST /api/articles', () => {
+  test("returns an object", () => {
+    const input = {
+      author : 'butter_bridge',
+      title : 'Good names',
+      body : 'If the cat is orange, Mango is a nice name',
+      topic : 'cats'
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(input)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.addedArticle).toBeInstanceOf(Object);
+      });
+  });
+  test("should return 201 and the posted comment", () => {
+    const input = {
+      author : 'butter_bridge',
+      title : 'Good names',
+      body : 'If the cat is orange, Mango is a nice name',
+      topic : 'cats'
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(input)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.addedArticle.author).toBe(input.author);
+        expect(body.addedArticle.title).toBe(input.title);
+        expect(body.addedArticle.body).toBe(input.body);
+        expect(body.addedArticle.topic).toBe(input.topic);
+      });
+  });
+  test("posted comment contains the author, article_id, body, created_at and votes properties", () => {
+    const input = {
+      author : 'butter_bridge',
+      title : 'Good names',
+      body : 'If the cat is orange, Mango is a nice name',
+      topic : 'cats'
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(input)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.addedArticle).toEqual(
+          expect.objectContaining({
+            author: expect.anything(),
+            title: expect.anything(),
+            body: expect.anything(),
+            article_id: expect.anything(),
+            topic: expect.anything(),
+            created_at: expect.anything(),
+            votes: expect.anything(),
+          })
+        );
+      });
+  });
+  test("invalid body value returns 400 Bad request, cannot insert into table", () => {
+    const input = {
+      author : 'butter_bridge',
+      title : 'Good names',
+      body : null,
+      topic : 'cats'
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request, cannot insert into table");
+      });
+  });
+  test("invalid username value returns 400 Bad request, cannot insert into table", () => {
+    const input = {
+      author : 'rando',
+      title : 'Good names',
+      body : 'If the cat is orange, Mango is a nice name',
+      topic : 'cats'
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("invalid input format returns 400 Bad request", () => {
+    const input = {
+      wrong : 'butter_bridge',
+      format : 'Good names',
+      goes : 'If the cat is orange, Mango is a nice name',
+      here : 'cats'
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request, cannot insert into table");
+      });
+  });
+});
