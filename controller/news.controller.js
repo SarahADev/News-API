@@ -12,6 +12,8 @@ const {
   updateCommentVoteByID,
   insertArticle,
   insertTopic,
+  removeArticleByArticleID,
+  removeCommentsbyArticleID,
 } = require("../model/news.model");
 
 exports.getTopics = (req, res, next) => {
@@ -172,8 +174,33 @@ exports.postArticle = (req, res, next) => {
 
 exports.postTopic = (req, res, next) => {
   const { slug, description } = req.body;
-  insertTopic(slug, description).then((response) => {
-    res.status(201).send({ addedTopic: response });
-  })
-  .catch(next)
+  insertTopic(slug, description)
+    .then((response) => {
+      res.status(201).send({ addedTopic: response });
+    })
+    .catch(next);
+};
+
+exports.deleteArticleByArticleID = (req, res, next) => {
+  const { article_id } = req.params;
+  selectArticleByID(article_id)
+    .then((response) => {
+      if (response.comment_count > 0) {
+        console.log("has some comments");
+        removeCommentsbyArticleID(article_id).then((response) => {
+          removeArticleByArticleID(article_id).then ((response) => {
+            res.sendStatus(204)
+          })
+          .catch(next)
+        })
+        .catch(next)
+      } else {
+        console.log("no comments here");
+        removeArticleByArticleID(article_id).then((response) => {
+          res.sendStatus(204);
+        })
+        .catch(next)
+      }
+    })
+    .catch(next);
 };

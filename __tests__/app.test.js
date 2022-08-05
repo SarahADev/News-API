@@ -1010,7 +1010,7 @@ describe("GET /api/articles/:article_id/comments (pagination)", () => {
   });
 });
 
-describe.only("POST /api/topics", () => {
+describe("POST /api/topics", () => {
   test("returns an object of the posted topic", () => {
     const input = {
       slug: "squirrels",
@@ -1052,7 +1052,7 @@ describe.only("POST /api/topics", () => {
       .send(input)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('Bad request, cannot insert into table')
+        expect(body.msg).toBe("Bad request, cannot insert into table");
       });
   });
   test("invalid value for slug returns 400 bad request", () => {
@@ -1065,7 +1065,32 @@ describe.only("POST /api/topics", () => {
       .send(input)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('Bad request, cannot insert into table')
+        expect(body.msg).toBe("Bad request, cannot insert into table");
+      });
+  });
+});
+
+describe("DELETE /api/articles/:article_id", () => {
+  test("Deleted article with no comment count returns 204 no content", () => {
+    return request(app).delete("/api/articles/2").expect(204);
+  });
+  test("Delete article with associated comment count returns 204 no content", () => {
+    return request(app).delete("/api/articles/1").expect(204);
+  });
+  test("Invalid article_id returns 400 bad request", () => {
+    return request(app)
+      .delete("/api/articles/nonsense")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("Valid but out of range article_id returns 404 object not found", () => {
+    return request(app)
+      .delete("/api/articles/900")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Object not found");
       });
   });
 });
