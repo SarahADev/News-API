@@ -15,7 +15,8 @@ const {
   getUsersByUsername,
   patchCommentVoteByID,
   postArticle,
-  postTopic
+  postTopic,
+  deleteArticleByArticleID
 } = require("./controller/news.controller");
 
 app.get("/api/topics", getTopics);
@@ -34,6 +35,7 @@ app.patch("/api/articles/:article_id", patchArticleByID);
 app.patch("/api/comments/:comment_id", patchCommentVoteByID)
 
 app.delete('/api/comments/:comment_id', deleteCommentByCommentID)
+app.delete('/api/articles/:article_id', deleteArticleByArticleID)
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });
