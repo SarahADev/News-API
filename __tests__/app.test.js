@@ -782,7 +782,7 @@ describe('PATCH /api/comments/:comment_id', () => {
   });
 });
 
-describe.only('POST /api/articles', () => {
+describe('POST /api/articles', () => {
   test("returns an object", () => {
     const input = {
       author : 'butter_bridge',
