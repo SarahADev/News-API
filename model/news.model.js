@@ -120,3 +120,33 @@ exports.removeCommentByCommentID = (comment_id) => {
       }
     });
 };
+
+exports.selectUsersByUsername = (username) => {
+  return db
+  .query(
+    "SELECT * FROM users WHERE username = $1;",
+    [username]
+  )
+  .then((res) => {
+    if (res.rowCount === 0) {
+      return Promise.reject({ status: 404, msg: "User not found" });
+    } else {
+      return res.rows[0];
+    }
+  });
+}
+
+exports.updateCommentVoteByID = (comment_id, newVotes) => {
+  return db
+    .query(
+      "UPDATE comments SET votes = votes + $1 WHERE comment_id = $2 RETURNING *;",
+      [newVotes, comment_id]
+    )
+    .then((res) => {
+      if (res.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "Object not found" });
+      } else {
+        return res.rows[0];
+      }
+    });
+};

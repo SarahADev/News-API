@@ -11,7 +11,9 @@ const {
   getCommentsByArticleID,
   postCommentByArticleID,
   deleteCommentByCommentID,
-  getEndpoints
+  getEndpoints,
+  getUsersByUsername,
+  patchCommentVoteByID
 } = require("./controller/news.controller");
 
 app.get("/api/topics", getTopics);
@@ -20,10 +22,12 @@ app.get("/api/users", getUsers);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleID);
 app.get('/api', getEndpoints)
+app.get('/api/users/:username', getUsersByUsername)
 
 app.post("/api/articles/:article_id/comments", postCommentByArticleID);
 
 app.patch("/api/articles/:article_id", patchArticleByID);
+app.patch("/api/comments/:comment_id", patchCommentVoteByID)
 
 app.delete('/api/comments/:comment_id', deleteCommentByCommentID)
 

@@ -8,6 +8,8 @@ const {
   selectArticles,
   insertCommentByArticleID,
   removeCommentByCommentID,
+  selectUsersByUsername,
+  updateCommentVoteByID
 } = require("../model/news.model");
 
 exports.getTopics = (req, res, next) => {
@@ -35,7 +37,6 @@ exports.patchArticleByID = (req, res, next) => {
     const { inc_votes } = req.body;
     updateArticleByID(article_id, inc_votes)
       .then((output) => {
-        ("controller then");
         res.status(200).send({ updatedArticle: output });
       })
       .catch(next);
@@ -132,4 +133,27 @@ exports.getEndpoints = (req, res, next) => {
     ],
   };
   res.status(200).json(endpoints);
+};
+
+exports.getUsersByUsername = (req, res, next) => {
+  const { username } = req.params;
+  selectUsersByUsername(username)
+    .then((response) => {
+      res.status(200).send({ user: response });
+    })
+    .catch(next);
+};
+
+exports.patchCommentVoteByID = (req, res, next) => {
+  if (!req.body.hasOwnProperty("inc_votes")) {
+    res.status(400).send({ msg: "Bad request" });
+  } else {
+    const { comment_id } = req.params;
+    const { inc_votes } = req.body;
+    updateCommentVoteByID(comment_id, inc_votes)
+      .then((output) => {
+        res.status(200).send({ updatedComment: output });
+      })
+      .catch(next);
+  }
 };
