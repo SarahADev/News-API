@@ -1001,11 +1001,71 @@ describe("GET /api/articles/:article_id/comments (pagination)", () => {
   });
   test("default page value is 1", () => {
     return request(app)
-    .get("/api/articles/1/comments?limit=5&&page=1")
-    .expect(200)
-    .then(({ body }) => {
-      expect(body.comments.length).toBe(5);
-      //how to properly test this without sort_by?
-    });
+      .get("/api/articles/1/comments?limit=5&&page=1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(5);
+        //how to properly test this without sort_by?
+      });
+  });
+});
+
+describe.only("POST /api/topics", () => {
+  test("returns an object of the posted topic", () => {
+    const input = {
+      slug: "squirrels",
+      description: "rodents but cute",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(input)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.addedTopic).toBeInstanceOf(Object);
+      });
+  });
+  test("has properties of slug and description", () => {
+    const input = {
+      slug: "squirrels",
+      description: "rodents but cute",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(input)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.addedTopic).toEqual(
+          expect.objectContaining({
+            slug: expect.anything(),
+            description: expect.anything(),
+          })
+        );
+      });
+  });
+  test("invalid format returns 400 bad request", () => {
+    const input = {
+      wrong: "squirrels",
+      format: "rodents but cute",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad request, cannot insert into table')
+      });
+  });
+  test("invalid value for slug returns 400 bad request", () => {
+    const input = {
+      slug: null,
+      description: "rodents but cute",
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(input)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad request, cannot insert into table')
+      });
   });
 });

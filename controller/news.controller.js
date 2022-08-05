@@ -10,7 +10,8 @@ const {
   removeCommentByCommentID,
   selectUsersByUsername,
   updateCommentVoteByID,
-  insertArticle
+  insertArticle,
+  insertTopic,
 } = require("../model/news.model");
 
 exports.getTopics = (req, res, next) => {
@@ -55,15 +56,15 @@ exports.getUsers = (req, res, next) => {
 exports.getArticles = (req, res, next) => {
   const { sort_by, order, topic, limit, page } = req.query;
   selectArticles(sort_by, order, topic, limit, page)
-    .then(({results, total_count}) => {
-      res.status(200).send({ articles: results , total_count : total_count});
+    .then(({ results, total_count }) => {
+      res.status(200).send({ articles: results, total_count: total_count });
     })
     .catch(next);
 };
 
 exports.getCommentsByArticleID = (req, res, next) => {
   const { article_id } = req.params;
-  const {limit, page} = req.query
+  const { limit, page } = req.query;
   selectCommentsByArticleID(article_id, limit, page)
     .then((response) => {
       res.status(200).send({ comments: response });
@@ -162,10 +163,17 @@ exports.patchCommentVoteByID = (req, res, next) => {
 
 exports.postArticle = (req, res, next) => {
   const { author, title, body, topic } = req.body;
-
   insertArticle(author, title, body, topic)
     .then((response) => {
       res.status(201).send({ addedArticle: response });
     })
     .catch(next);
+};
+
+exports.postTopic = (req, res, next) => {
+  const { slug, description } = req.body;
+  insertTopic(slug, description).then((response) => {
+    res.status(201).send({ addedTopic: response });
+  })
+  .catch(next)
 };
