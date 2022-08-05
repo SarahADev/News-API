@@ -14,7 +14,8 @@ const {
   getEndpoints,
   getUsersByUsername,
   patchCommentVoteByID,
-  postArticle
+  postArticle,
+  postTopic
 } = require("./controller/news.controller");
 
 app.get("/api/topics", getTopics);
@@ -27,6 +28,7 @@ app.get('/api/users/:username', getUsersByUsername)
 
 app.post("/api/articles/:article_id/comments", postCommentByArticleID);
 app.post('/api/articles', postArticle)
+app.post('/api/topics', postTopic)
 
 app.patch("/api/articles/:article_id", patchArticleByID);
 app.patch("/api/comments/:comment_id", patchCommentVoteByID)
