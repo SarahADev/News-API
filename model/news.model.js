@@ -42,7 +42,12 @@ exports.selectUsers = () => {
   });
 };
 
-exports.selectArticles = (sort_by = "created_at", order = "DESC", topic) => {
+exports.selectArticles = (
+  sort_by = "created_at",
+  order = "DESC",
+  topic,
+  limit = 10
+) => {
   const validSortBy = [
     "article_id",
     "title",
@@ -65,12 +70,14 @@ exports.selectArticles = (sort_by = "created_at", order = "DESC", topic) => {
     "SELECT articles.article_id, articles.title, articles.author, articles.topic, articles.created_at, articles.votes, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id";
 
   if (topic !== undefined) {
-    queryStr += ` WHERE articles.topic = '${topic}' GROUP BY articles.article_id `;
-  } else {
-    queryStr += " GROUP BY articles.article_id ";
+    queryStr += ` WHERE articles.topic = '${topic}'`;
   }
 
-  queryStr += `ORDER BY ${sort_by} ${order};`;
+  queryStr += " GROUP BY articles.article_id ";
+
+  queryStr += `ORDER BY ${sort_by} ${order} `;
+
+  queryStr += `LIMIT ${limit}`;
 
   return db.query(queryStr).then((res) => {
     if (res.rowCount === 0) {
@@ -123,18 +130,15 @@ exports.removeCommentByCommentID = (comment_id) => {
 
 exports.selectUsersByUsername = (username) => {
   return db
-  .query(
-    "SELECT * FROM users WHERE username = $1;",
-    [username]
-  )
-  .then((res) => {
-    if (res.rowCount === 0) {
-      return Promise.reject({ status: 404, msg: "User not found" });
-    } else {
-      return res.rows[0];
-    }
-  });
-}
+    .query("SELECT * FROM users WHERE username = $1;", [username])
+    .then((res) => {
+      if (res.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "User not found" });
+      } else {
+        return res.rows[0];
+      }
+    });
+};
 
 exports.updateCommentVoteByID = (comment_id, newVotes) => {
   return db
@@ -152,10 +156,12 @@ exports.updateCommentVoteByID = (comment_id, newVotes) => {
 };
 
 exports.insertArticle = (author, title, body, topic) => {
-  return db.query(
-    'INSERT INTO articles (author, title, body, topic) VALUES ($1, $2, $3, $4) RETURNING *;', [author, title, body, topic]
-  )
-  .then(({rows}) => {
-    return rows[0]
-  })
-}
+  return db
+    .query(
+      "INSERT INTO articles (author, title, body, topic) VALUES ($1, $2, $3, $4) RETURNING *;",
+      [author, title, body, topic]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
