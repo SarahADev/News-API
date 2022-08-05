@@ -51,6 +51,8 @@ app.use((err, req, res, next) => {
     res.status(400).send({ msg: "Bad request" });
   } else if (err.code === "23502") {
     res.status(400).send({ msg: "Bad request, cannot insert into table" });
+  } else if (err.code === '42703') {
+    res.status(400).send({msg: 'Bad request'})
   } else {
     next(err)
   }
