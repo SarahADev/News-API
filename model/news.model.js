@@ -78,7 +78,6 @@ exports.selectArticles = (
 
   queryStr += `ORDER BY ${sort_by} ${order} `;
 
-  // queryStr += `LIMIT ${limit}`;
   if (limit <= 0 || isNaN(+limit)) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
