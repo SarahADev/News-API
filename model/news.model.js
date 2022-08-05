@@ -150,3 +150,12 @@ exports.updateCommentVoteByID = (comment_id, newVotes) => {
       }
     });
 };
+
+exports.insertArticle = (author, title, body, topic) => {
+  return db.query(
+    'INSERT INTO articles (author, title, body, topic) VALUES ($1, $2, $3, $4) RETURNING *;', [author, title, body, topic]
+  )
+  .then(({rows}) => {
+    return rows[0]
+  })
+}
