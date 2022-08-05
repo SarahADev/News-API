@@ -78,7 +78,7 @@ exports.selectArticles = (
 
   queryStr += `ORDER BY ${sort_by} ${order} `;
 
-  if (limit <= 0 || isNaN(+limit)) {
+  if (limit <= 0 || isNaN(+limit) || isNaN(+page)) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
   const startIndex = (page - 1) * limit;
@@ -95,7 +95,12 @@ exports.selectArticles = (
   });
 };
 
-exports.selectCommentsByArticleID = (article_id) => {
+exports.selectCommentsByArticleID = (article_id, limit = 10, page = 1) => {
+  if (limit <= 0 || isNaN(+limit) || isNaN(+page)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
   return db
     .query(
       "SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id = $1",
@@ -105,7 +110,8 @@ exports.selectCommentsByArticleID = (article_id) => {
       if (res.rowCount === 0) {
         return Promise.reject({ status: 404, msg: "Object not found" });
       } else {
-        return res.rows;
+        const results = res.rows.slice(startIndex, endIndex);
+        return results;
       }
     });
 };

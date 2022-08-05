@@ -936,7 +936,76 @@ describe("GET /api/articles (pagination)", () => {
       .get("/api/articles?limit=5&&page=3&&sort_by=article_id&&order=ASC")
       .expect(200)
       .then(({ body }) => {
-        expect(body.articles.length).toBe(2)
+        expect(body.articles.length).toBe(2);
       });
+  });
+  test("default page value is 1", () => {
+    return request(app)
+      .get("/api/articles?limit=5&&page=1&&sort_by=article_id&&order=ASC")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].article_id).toBe(1);
+        expect(body.articles[4].article_id).toBe(5);
+      });
+  });
+  test("invalid page query will return 400 bad request", () => {
+    return request(app)
+      .get("/api/articles?page=bananas")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments (pagination)", () => {
+  test("query limit should limit number of results by specified value", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(5);
+      });
+  });
+  test("limit should default to 10", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(10);
+      });
+  });
+  test("0 or negative number limit value should return 400 bad request", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=0")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("invalid limit value returns 400 bad request", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=nonsense")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("page query shows relevant comments based on limit", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5&&page=2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(5);
+      });
+  });
+  test("default page value is 1", () => {
+    return request(app)
+    .get("/api/articles/1/comments?limit=5&&page=1")
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.comments.length).toBe(5);
+      //how to properly test this without sort_by?
+    });
   });
 });

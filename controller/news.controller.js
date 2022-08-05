@@ -63,7 +63,8 @@ exports.getArticles = (req, res, next) => {
 
 exports.getCommentsByArticleID = (req, res, next) => {
   const { article_id } = req.params;
-  selectCommentsByArticleID(article_id)
+  const {limit, page} = req.query
+  selectCommentsByArticleID(article_id, limit, page)
     .then((response) => {
       res.status(200).send({ comments: response });
     })
