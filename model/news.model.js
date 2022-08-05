@@ -46,7 +46,8 @@ exports.selectArticles = (
   sort_by = "created_at",
   order = "DESC",
   topic,
-  limit = 10
+  limit = 10,
+  page = 1
 ) => {
   const validSortBy = [
     "article_id",
@@ -77,13 +78,20 @@ exports.selectArticles = (
 
   queryStr += `ORDER BY ${sort_by} ${order} `;
 
-  queryStr += `LIMIT ${limit}`;
+  // queryStr += `LIMIT ${limit}`;
+  if (limit <= 0 || isNaN(+limit)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
 
   return db.query(queryStr).then((res) => {
     if (res.rowCount === 0) {
       return Promise.reject({ status: 404, msg: "Object not found" });
     } else {
-      return res.rows;
+      const results = res.rows.slice(startIndex, endIndex);
+      const total_count = res.rowCount;
+      return { results, total_count };
     }
   });
 };

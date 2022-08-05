@@ -53,10 +53,10 @@ exports.getUsers = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  const { sort_by, order, topic, limit } = req.query;
-  selectArticles(sort_by, order, topic, limit)
-    .then((response) => {
-      res.status(200).send({ articles: response });
+  const { sort_by, order, topic, limit, page } = req.query;
+  selectArticles(sort_by, order, topic, limit, page)
+    .then(({results, total_count}) => {
+      res.status(200).send({ articles: results , total_count : total_count});
     })
     .catch(next);
 };

@@ -888,12 +888,14 @@ describe("POST /api/articles", () => {
 });
 
 describe("GET /api/articles (pagination)", () => {
-  test("limits result number to limit query", () => {
+  test("limits result number to limit query and displays total count", () => {
     return request(app)
-      .get("/api/articles?limit=5")
+      .get("/api/articles?limit=5&&sort_by=article_id&&order=ASC")
       .expect(200)
       .then(({ body }) => {
         expect(body.articles.length).toBe(5);
+        expect(body.total_count).toBe(12);
+        expect(body.hasOwnProperty("total_count")).toBe(true);
       });
   });
   test("default limit is 10", () => {
@@ -909,7 +911,32 @@ describe("GET /api/articles (pagination)", () => {
       .get("/api/articles?limit=bananas")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe('Bad request')
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("Negative or 0 limit number returns 400 bad request", () => {
+    return request(app)
+      .get("/api/articles?limit=0")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("page query will show the next available articles, calculated using limit", () => {
+    return request(app)
+      .get("/api/articles?limit=5&&page=2&&sort_by=article_id&&order=ASC")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles[0].article_id).toBe(6);
+        expect(body.articles[4].article_id).toBe(10);
+      });
+  });
+  test("remainder page displays only remaining results despite limit", () => {
+    return request(app)
+      .get("/api/articles?limit=5&&page=3&&sort_by=article_id&&order=ASC")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(2)
       });
   });
 });
