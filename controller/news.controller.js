@@ -96,46 +96,212 @@ exports.deleteCommentByCommentID = (req, res, next) => {
 
 exports.getEndpoints = (req, res, next) => {
   const endpoints = {
-    Endpoints: [
-      {
-        Endpoint: "GET /api/topics",
-        Description:
-          "Returns an array of topic objects, including slug and description properties.",
+    Endpoints: {
+      "GET /api/articles": {
+        description: "Responds with an array of all articles",
+        queries: ["sort_by", "order", "topic", "limit", "page"],
+        exampleResponse: {
+          articles: [
+            {
+              article_id: 1,
+              title: "Running a Node App",
+              author: "jessjelly",
+              topic: "coding",
+              created_at: "2020-11-07T06:03:00.000Z",
+              votes: 0,
+              comment_count: 8,
+            },
+          ],
+        },
       },
-      {
-        Endpoint: "GET /api/users",
-        Description: "Responds with an array of user objects.",
+      "POST /api/articles": {
+        description: "Creates a new article",
+        requestBody: {
+          keys: [
+            "author (String)",
+            "title (String)",
+            "body (String)",
+            "topic (String)",
+          ],
+          exampleBody: {
+            author: "butter_bridge",
+            title: "Good names",
+            body: "If the cat is orange, Mango is a nice name",
+            topic: "cats",
+          },
+        },
+        exampleResponse: {
+          addedArticle: [
+            {
+              article_id: 13,
+              title: "Good names",
+              topic: "cats",
+              author: "butter_bridge",
+              body: "If the cat is orange, Mango is a nice name",
+              created_at: "2022-08-20T13:44:15.531Z",
+              votes: 0,
+            },
+          ],
+        },
       },
-      {
-        Endpoint: "GET /api/articles",
-        Description:
-          "Returns an array of article objects, including the comment count for each article. Optional queries of sort_by, order and topic to sort and filter the returned array.",
+      "GET /api/articles/:article_id": {
+        description: "Returns a single article",
+        exampleResponse: {
+          article: [
+            {
+              article_id: 1,
+              title: "Running a Node App",
+              author: "jessjelly",
+              body: "This is part two of a series on how to get up and running with Systemd and Node.js.",
+              topic: "coding",
+              created_at: "2020-11-07T06:03:00.000Z",
+              votes: 0,
+              comment_count: 8,
+            },
+          ],
+        },
       },
-      {
-        Endpoint: "GET /api/articles/:article_id",
-        Description:
-          "Returns the article with associated article_id, including the count of associated comments.",
+      "PATCH /api/articles/:article_id": {
+        description: "Updates an article",
+        requestBody: {
+          keys: ["inc_votes (Integer)"],
+          exampleBody: { inc_votes: 3 },
+        },
+        exampleResponse: {
+          updatedArticle: {
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 103,
+          },
+        },
       },
-      {
-        Endpoint: "PATCH /api/articles/:article_id",
-        Description:
-          "Takes an object with inc_votes property and INT value, and amends the vote count on the associated article by the value. (E.g. { inc_votes : 3 } )",
+      "DELETE /api/articles/:article_id": {
+        description: "Deletes a single article",
+        exampleResponse:
+          "Status 204- No Content. No body is returned by this endpoint.",
       },
-      {
-        Endpoint: "GET /api/articles/:article_id/comments",
-        Description:
-          "Returns an array of comments with the associated article_id number.",
+      "GET /api/articles/:article_id/comments": {
+        description:
+          "Returns an array of comments associated with a single article",
+        exampleResponse: {
+          comments: [
+            {
+              comment_id: 2,
+              votes: 14,
+              created_at: "2020-10-31T03:03:00.000Z",
+              author: "butter_bridge",
+              body: "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+            },
+            {
+              comment_id: 3,
+              votes: 100,
+              created_at: "2020-03-01T01:13:00.000Z",
+              author: "icellusedkars",
+              body: "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works.",
+            },
+          ],
+        },
       },
-      {
-        Endpoint: "POST /api/articles/:article_id/comments",
-        Description:
-          'Takes an object of an authorised user (username) and comment (body), and posts the comment. (E.g. { username : "User", body : "Comment"} )',
+      "POST /api/articles/:article_id/comments": {
+        description: "Creates a new comment on an article",
+        requestBody: {
+          keys: ["username (String)", "body (String"],
+          exampleBody: {
+            username: "butter_bridge",
+            body: "A comment here",
+          },
+        },
+        exampleResponse: {
+          addedComment: {
+            comment_id: 19,
+            body: "A comment here",
+            article_id: 1,
+            author: "butter_bridge",
+            votes: 0,
+            created_at: "2022-08-20T14:05:55.587Z",
+          },
+        },
       },
-      {
-        Endpoint: "DELETE /api/comments/:comment_id",
-        Description: "Deletes the comment with the associated comment_id.",
+      "PATCH /api/comments/:comment_id": {
+        description: "Updates a single comments votes.",
+        requestBody: {
+          keys: ["inc_votes (Integer"],
+          exampleBody: { inc_votes: 3 },
+        },
+        exampleResponse: {
+          updatedComment: {
+            comment_id: 1,
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            article_id: 9,
+            author: "butter_bridge",
+            votes: 19,
+            created_at: "2020-04-06T12:17:00.000Z",
+          },
+        },
       },
-    ],
+      "DELETE /api/comments/:comment_id": {
+        description: "Deletes a single comment.",
+        exampleResponse:
+          "Status 204- No Content. No body is returned by this endpoint.",
+      },
+      "GET /api/topics": {
+        description: "Returns an array of all topics.",
+        exampleResponse: {
+          topics: [
+            { slug: "coding", description: "Code is love, code is life" },
+            { slug: "football", description: "FOOTIE!" },
+            {
+              slug: "cooking",
+              description: "Hey good looking, what you got cooking?",
+            },
+          ],
+        },
+      },
+      "POST /api/topics": {
+        description: "Adds a topic",
+        requestBody: {
+          keys: ["slug (String)", "description (String"],
+          exampleBody: { slug: "squirrels", description: "rodents but cute" },
+        },
+        exampleResponse: {
+          addedTopic: { slug: "squirrels", description: "rodents but cute" },
+        },
+      },
+      "GET /api/users": {
+        description: "Returns an array of all users.",
+        exampleResponse: {
+          users: [
+            {
+              username: "butter_bridge",
+              name: "jonny",
+              avatar_url:
+                "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+            },
+            {
+              username: "icellusedkars",
+              name: "sam",
+              avatar_url:
+                "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
+            },
+          ],
+        },
+      },
+      "GET /api/users/:username": {
+        description: "Returns a single user",
+        exampleResponse: {
+          user: {
+            username: "butter_bridge",
+            name: "jonny",
+            avatar_url:
+              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+          },
+        },
+      },
+    },
   };
   res.status(200).json(endpoints);
 };
@@ -186,20 +352,21 @@ exports.deleteArticleByArticleID = (req, res, next) => {
   selectArticleByID(article_id)
     .then((response) => {
       if (response.comment_count > 0) {
-        console.log("has some comments");
-        removeCommentsbyArticleID(article_id).then((response) => {
-          removeArticleByArticleID(article_id).then ((response) => {
-            res.sendStatus(204)
+        removeCommentsbyArticleID(article_id)
+          .then((response) => {
+            removeArticleByArticleID(article_id)
+              .then((response) => {
+                res.sendStatus(204);
+              })
+              .catch(next);
           })
-          .catch(next)
-        })
-        .catch(next)
+          .catch(next);
       } else {
-        console.log("no comments here");
-        removeArticleByArticleID(article_id).then((response) => {
-          res.sendStatus(204);
-        })
-        .catch(next)
+        removeArticleByArticleID(article_id)
+          .then((response) => {
+            res.sendStatus(204);
+          })
+          .catch(next);
       }
     })
     .catch(next);
